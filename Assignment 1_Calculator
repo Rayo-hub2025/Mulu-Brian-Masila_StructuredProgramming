@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <ctype.h>
+#include <limits.h>
+
+long long get_integer(const char *prompt) {
+    char buf[256];
+    char *endptr;
+    long long val;
+    while (1) {
+        fputs(prompt, stdout);
+        if (!fgets(buf, sizeof(buf), stdin)) {
+            /* EOF or read error */
+            fprintf(stderr, "\nInput error. Exiting.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        /* remove trailing newline */
+        size_t len = strlen(buf);
+        if (len > 0 && buf[len - 1] == '\n') buf[len - 1] = '\0';
+
+        errno = 0;
+        endptr = NULL;
+        val = strtoll(buf, &endptr, 10);
+
+        /* skip any trailing whitespace */
+        while (endptr && *endptr && isspace((unsigned char)*endptr)) endptr++;
+
+        if (endptr && *endptr == '\0' && errno != ERANGE) {
+            return val;
+        }
+
+        if (errno == ERANGE) {
+            fprintf(stderr, "Number out of range. Please enter a valid integer within %lld .. %lld.\n",
+                    (long long)LLONG_MIN, (long long)LLONG_MAX);
+        } else {
+            fprintf(stderr, "Invalid integer input. Please try again.\n");
+        }
+    }
+}
+
+int main(void) {
+    puts("Simple Calculator (C)");
+    puts("Enter two integers. Division result will be shown as floating point. Modulus uses integer remainder.\n");
+
+    long long a = get_integer("Enter the first integer: ");
+    long long b = get_integer("Enter the second integer: ");
+
+    /* Compute and display */
+    printf("\nResults:\n");
+    printf("%lld + %lld = %lld\n", a, b, a + b);
+    printf("%lld - %lld = %lld\n", a, b, a - b);
+    printf("%lld * %lld = %lld\n", a, b, a * b);
+
+    if (b == 0) {
+        printf("%lld / %lld = Error: division by zero\n", a, b);
+        printf("%lld %% %lld = Error: modulus by zero\n", a, b);
+    } else {
+        double da = (double)a;
+        double db = (double)b;
+        printf("%lld / %lld = %.6f\n", a, b, da / db);
+        printf("%lld %% %lld = %lld\n", a, b, a % b);
+    }
+
+    return 0;
+}
