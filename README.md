@@ -1,4 +1,4 @@
-**Normal variable** -stores an actual value and memory is accessed directly using the variable name.
+**Normal variable** -stores an actual value and memory is accessed directly using the variable name.br
 int x = 10;
 printf("%d",x);
 **Pointer** stores memory address of another variable and memory is addressed indirectly through address stored in the pointer.
